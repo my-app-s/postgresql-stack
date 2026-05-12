@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:${VERSION:-latest}
+    container_name: postgres-${VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: postgres
+      POSTGRES_DB: practice
+      TZ: UTC
+    volumes:
+      - postgres_data_volume:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      - posgresql_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    profiles:
+      - tools
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      TZ: UTC
+    volumes:
+      - pgadmin_data_volume:/var/lib/pgadmin
+    ports:
+      - "9080:80"
+    depends_on:
+      - postgres
+    networks:
+      - posgresql_network
+
+volumes:
+  postgres_data_volume:
+    name: postgres_data_volume
+  apostgres_data_volume:
+    name: apostgres_data_volume
+  pgadmin_data_volume:
+    name: pgadmin_data_volume
+
+networks:
+  posgresql_network:
+    name: posgresql_bridge_network
+    driver: bridge
