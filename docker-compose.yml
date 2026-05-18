@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:${VERSION:-latest}
-    container_name: postgres-${VERSION:-latest}
+    container_name: postgres
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: secret
@@ -10,10 +10,15 @@ services:
       TZ: UTC
     volumes:
       - postgres_data_volume:/var/lib/postgresql
-    ports:
-      - "5432:5432"
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED:-false}"
+      - "traefik.http.routers.postgres.rule=Host(`${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.postgres.entrypoints=websecure"
+      - "traefik.http.services.postgres.loadbalancer.server.port=${HOST_PORT_P:-5432}"
+      - "traefik.http.routers.postgres.tls=true"
+      - "traefik.http.routers.postgres.tls.certresolver=${CERT_RESOLVER:-}"
     networks:
-      - posgresql_network
+      - network_stack
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -27,22 +32,25 @@ services:
       TZ: UTC
     volumes:
       - pgadmin_data_volume:/var/lib/pgadmin
-    ports:
-      - "9080:80"
     depends_on:
       - postgres
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED:-false}"
+      - "traefik.http.routers.pgadmin.rule=Host(`${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.pgadmin.entrypoints=websecure"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=${HOST_PORT_PG:-80}"
+      - "traefik.http.routers.pgadmin.tls=true"
+      - "traefik.http.routers.pgadmin.tls.certresolver=${CERT_RESOLVER:-}"
     networks:
-      - posgresql_network
+      - network_stack
 
 volumes:
   postgres_data_volume:
     name: postgres_data_volume
-  apostgres_data_volume:
-    name: apostgres_data_volume
   pgadmin_data_volume:
     name: pgadmin_data_volume
 
 networks:
-  posgresql_network:
-    name: posgresql_bridge_network
-    driver: bridge
+  network_stack:
+    name: ${TRAEFIK_NETWORK_NAME:-postgres_network}
+    external: ${TRAEFIK_NETWORK_EXTERNAL:-false}
