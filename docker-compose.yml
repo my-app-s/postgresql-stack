@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:${VERSION:-latest}
+    image: postgres:${VERSION_P:-latest}
     container_name: postgres
     restart: unless-stopped
     environment:
@@ -14,7 +14,7 @@ services:
       - network_stack
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:${VERSION_PG:-latest}
     container_name: pgadmin
     restart: unless-stopped
     profiles:
@@ -45,5 +45,5 @@ volumes:
 
 networks:
   network_stack:
-    name: ${TRAEFIK_NETWORK_NAME:-postgres_network}
+    name: ${TRAEFIK_NETWORK_NAME:-db_stack_network}
     external: ${TRAEFIK_NETWORK_EXTERNAL:-false}

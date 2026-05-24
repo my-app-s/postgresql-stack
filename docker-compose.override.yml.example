@@ -1,11 +1,18 @@
+# Exposes Postgres and pgAdmin to host (localhost only by default)
+# Required for external tools (e.g., DBeaver / psql for Postgres, browser for pgAdmin)
+# Docker internal network access is not affected
+#
+# Открывает доступ к Postgres и pgAdmin с хоста (по умолчанию только localhost)
+# Нужно для подключения с локальной машины (например, DBeaver / psql для Postgres, браузер для pgAdmin)
+# Доступ внутри Docker-сети не изменяется и продолжает работать
+
 services:
   postgres:
     ports:
-      - "${HOST_PORT:-127.0.0.1:5432}:5432"
-      # exposes Postgres to host (localhost only by default)
-      # required for external tools like DBeaver / psql on host
-      # Docker internal network access is not affected
-      #
-      # открывает доступ к Postgres с хоста (по умолчанию только localhost)
-      # нужно для подключения с локальной машины (например DBeaver / psql)
-      # доступ внутри Docker-сети не изменяется и продолжает работать
+      - "${HOST_PORT_P:-127.0.0.1:5432}:5432"
+
+  # Uncomment if you need direct web access to pgAdmin without a reverse proxy (e.g., Traefik)
+  # Раскомментируйте, если нужен прямой доступ к pgAdmin без reverse-proxy (например, Traefik)
+  #pgadmin:
+  #  ports:
+  #    - "${HOST_PORT_PG:-127.0.0.1:8080}:80"
