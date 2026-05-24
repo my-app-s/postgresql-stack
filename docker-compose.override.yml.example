@@ -1,0 +1,11 @@
+services:
+  postgres:
+    ports:
+      - "${HOST_PORT:-127.0.0.1:5432}:5432"
+      # exposes Postgres to host (localhost only by default)
+      # required for external tools like DBeaver / psql on host
+      # Docker internal network access is not affected
+      #
+      # открывает доступ к Postgres с хоста (по умолчанию только localhost)
+      # нужно для подключения с локальной машины (например DBeaver / psql)
+      # доступ внутри Docker-сети не изменяется и продолжает работать

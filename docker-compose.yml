@@ -8,8 +8,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: practice
       TZ: UTC
-    ports:
-      - "${HOST_PORT:-127.0.0.1:5432}:5432"
     volumes:
       - postgres_data_volume:/var/lib/postgresql
     networks:
