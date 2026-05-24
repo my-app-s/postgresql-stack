@@ -5,7 +5,7 @@
 >
 > 📦 **This is a recipe** for deploy container postgresql and pgAdmin as tools.
 
-## <a name="intro"></a>1. Введение
+## Введение
 - Рецепт создан для упрощения развертывания postgresql c pgAdmin с возможностью поджключения к сети docker управляемой маршрутизацией **traefik**.
 - возможное использование локальное или через маршрутизацию **traefik**
     - для локального использование в переменную `TRAEFIK_NETWORK_NAME` указывать не нужно, бедет использовано по умолчанию название ***db_stack_network*** с параметром ***external*** с значением **false**, значение **false** необхоимо для режима разработки или локального использования докер сам создаст сеть с дефолтным именем
@@ -39,7 +39,7 @@
 - `TRAEFIK_NETWORK_NAME` имя сети **traefik**
 - `TRAEFIK_NETWORK_EXTERNAL` булевое значение для выбора режима работы сети то есть докер создаст сеть локальную или подключится к уже созданной сети **traefik**
 
-## <a name="env"></a>3. Настройка переменных окружения
+## Настройка переменных окружения
 
 ### Файл .env.example
 
@@ -112,10 +112,17 @@ up with pgAdmin: `docker compose --profile tools up -d`(down: `docker compose --
 > Не меняйте имена волумов без необходимости:
 > Если вы переименуете postgres_data_volume в postgres_super_data, Docker при запуске создаст абсолютно новый, пустой волум, а старый останется в системе.
 
-## <a name="disclamer"></a>5. ⚠️ Disclaimer / Отказ от ответственности
+## 📜 Disclaimer
 
-**English**: Materials are provided ***"as is"*** under the LICENSE file. No warranties, no rights granted unless explicitly stated. Authors are not liable for damages. No partnership or obligations created.  
+**English**: Materials are provided ***as is*** under the LICENSE file. No warranties, no rights granted unless explicitly stated. Authors are not liable for damages. No partnership or obligations created.  
 
-**Русский**: Материалы предоставляются ***"как есть"*** и регулируются LICENSE. Гарантий нет, права не передаются без явного указания. Автор(ы) не несут ответственности. Партнёрство или обязательства не создаются.  
+**Русский**: Материалы предоставляются ***как есть*** и регулируются LICENSE. Гарантий нет, права не передаются без явного указания. Автор(ы) не несут ответственности. Партнёрство или обязательства не создаются.  
 
 📌 See full disclaimer in [DISCLAIMER.md](https://github.com/my-app-s/my-app-s/blob/main/DISCLAIMER.md)
+
+---
+
+## 📜 Лицензия
+
+Проект лицензирован под **GNU Affero General Public License v3.0 (AGPLv3)**.
+См. [LICENSE](./LICENSE) для подробностей.
