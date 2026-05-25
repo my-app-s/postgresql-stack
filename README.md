@@ -6,11 +6,23 @@
 > 📦 **This is a recipe** for deploy container postgresql and pgAdmin as tools.
 
 ## Введение
-- Рецепт создан для упрощения развертывания postgresql c pgAdmin с возможностью поджключения к сети docker управляемой маршрутизацией **traefik**.
-- возможное использование локальное или через маршрутизацию **traefik**
-    - для локального использование в переменную `TRAEFIK_NETWORK_NAME` указывать не нужно, бедет использовано по умолчанию название ***db_stack_network*** с параметром ***external*** с значением **false**, значение **false** необхоимо для режима разработки или локального использования докер сам создаст сеть с дефолтным именем
-        - выставив для ***external*** значение **true** докер сам сеть создовать не будет так подрозумевается что сеть **traefik** к примеру ***traefik_public_network*** уже создана с контейнером **traefik**
-    - для использования маршрутизации **traefik** необходимо в переменной `TRAEFIK_NETWORK_NAME` задать назвние сети из контейнера с **traefik** и задать для ***external*** значение **true** так сеть не будет создаваться докером и будет использоваться заданная сеть
+- Рецепт предназначен для упрощённого развёртывания **PostgreSQL** и **pgAdmin** 
+  с возможностью подключения к Docker-сети и использования маршрутизации через **Traefik**.
+
+- Возможны два сценария использования:
+
+  **1. Локальный режим (без Traefik):**
+  - переменную `TRAEFIK_NETWORK_NAME` указывать не нужно;
+  - используется сеть по умолчанию — `db_stack_network`;
+  - параметр `external` = `false`.
+
+  Docker автоматически создаст сеть. Подходит для разработки и простого локального запуска.
+
+  **2. Использование с Traefik (локальным или внешним):**
+  - в переменной `TRAEFIK_NETWORK_NAME` необходимо указать имя сети, к которой подключён контейнер **Traefik** (например, `traefik_public_network`);
+  - параметр `external` должен быть установлен в `true`.
+
+  В этом случае Docker не создаёт сеть — используется уже существующая сеть, в которой работает **Traefik** (независимо от того, развёрнут он локально или на отдельном сервере).
 
 ## Настройка переменных окружения
 
@@ -81,33 +93,37 @@
 
 ## Deploy
 
+Up stack as default with service pgAdmin.
+
+```bash
+docker docker compose --profile tools up -d
+```
+
+Down stack as default with service pgAdmin.
+
+```bash
+docker compose --profile tools down
+```
+
 Up stack as default without service pgAdmin, only base service postgresql.
 
 ```bash
-# up stack as default
 docker compose up -d
-# down stack as default
-docker compose down
 ```
 
-Up stack as default with service pgAdmin.
+Down stack as default without service pgAdmin, only base service postgresql.
+
+```bash
+docker compose down
+```
 
 > [!IMPORTANT]
 > Access pgAdmin by host ip:host port example:'192.168.100.1:9080'
 
-```bash
-# up stack with service pgAdmin
-docker docker compose --profile tools up -d
-# down stack with service pgAdmin
-docker compose --profile tools down
-```
-
-up with pgAdmin: `docker compose --profile tools up -d`(down: `docker compose --profile tools down`")
-
 > [!CAUTION]
 >
 > Не используйте флаг -v при очистке:
-> Если вы выполните команду остановки вот так: docker compose down -v (с флагом -v или --volumes), Docker удалит и контейнеры, и уничтожит все ваши волумы вместе с базой данных. Используйте эту команду только в том случае, если хотите намеренно сбросить проект до заводских настроек.
+> Если вы выполните команду остановки вот так: `docker compose down -v` (с флагом -v или --volumes), Docker удалит и контейнеры, и уничтожит все волумы container вместе с базой данных. Используйте эту команду только в том случае, если хотите намеренно сбросить проект до заводских настроек.
 >
 > Не меняйте имена волумов без необходимости:
 > Если вы переименуете postgres_data_volume в postgres_super_data, Docker при запуске создаст абсолютно новый, пустой волум, а старый останется в системе.
