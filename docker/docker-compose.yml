@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgres:${VERSION_P:-latest}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-practice}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      TZ: UTC
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_data_volume:/var/lib/postgresql
+    networks:
+      - network_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s # wait interval request
+      timeout: 5s
+      retries: 12 # ticket one to one sec
+
+  pgadmin:
+    image: dpage/pgadmin4:${VERSION_PG:-latest}
+    restart: unless-stopped
+    profiles:
+      - tools
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
+      # ОБЯЗАТЕЛЬНО ДЛЯ ПОРТА 9443 И TRAEFIK:
+      #PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      #PGADMIN_CONFIG_PROXY_X_FORWARDED_FOR: "True"
+      TZ: UTC
+    secrets:
+      - pgadmin_password
+    volumes:
+      - pgadmin_data_volume:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED:-false}"
+      - "traefik.http.routers.pgadmin.rule=Host(`${DOMAIN:-localhost}`)"
+      # замечание если используется свой траефик то указывть имя его websecure
+      # то есть если установлен traefik мой стек то можно использовать дефолт
+      # но если траефик используется другой то необходмо указать название
+      # переменной web
+      #
+      # кстати websecure используется из-за того что настроен редирект на traefik
+      # перенаправление на websecure тоесть с 80 на 443 порт для безопасности
+      # нужно вытащить в env
+      - "traefik.http.routers.pgadmin.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+      - "traefik.http.routers.pgadmin.tls=true"
+      - "traefik.http.routers.pgadmin.tls.certresolver=${CERT_RESOLVER:-}"
+    networks:
+      - network_stack
+      - network_db
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:80/misc/ping').read()"]
+      interval: 30s        # Когда всё работает штатно, проверяем редко (раз в 30 сек)
+      timeout: 2s
+      retries: 3           # Достаточно 3 провалов подряд, если сервер упал в процессе работы
+      start_period: 20s    # Даем 20 секунд форы на разгон
+      start_interval: 5s   # А вот в первые 20 секунд форы фигачим проверки каждые 5 секунд!
+
+volumes:
+  postgres_data_volume:
+    name: postgres_data_volume
+  pgadmin_data_volume:
+    name: pgadmin_data_volume
+
+networks:
+  network_stack:
+    name: ${TRAEFIK_NETWORK_NAME:-db_stack_network}
+    external: ${TRAEFIK_NETWORK_EXTERNAL:-false}
+  network_db:
+    name: db_access_network
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  pgadmin_password:
+    file: ./secrets/pgadmin_password.txt

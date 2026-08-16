@@ -26,6 +26,9 @@
 
 ## Настройка переменных окружения
 
+> [!IMPORTANT]
+> Настоятельно рекомендуется установить свои логины и пароли для безопасности
+
 - в репозитории находится шаблон .env.example файла, если это необходимо создайте копию этого файла с названием .env рядом с docker compose файлом
     - к примеру на linux для этого выполните комманду `cp .env.exapmle .env` находясь в скачаном репозитории
 - для работы переменных не обходимо расскоментировать нужные
@@ -96,25 +99,25 @@
 Up stack as default with service pgAdmin.
 
 ```bash
-docker docker compose --profile tools up -d
+docker compose --profile tools -p postgresql-stack up -d
 ```
 
 Down stack as default with service pgAdmin.
 
 ```bash
-docker compose --profile tools down
+docker compose --profile tools -p postgresql-stack down
 ```
 
 Up stack as default without service pgAdmin, only base service postgresql.
 
 ```bash
-docker compose up -d
+docker compose -p postgresql-stack up -d
 ```
 
 Down stack as default without service pgAdmin, only base service postgresql.
 
 ```bash
-docker compose down
+docker compose -p postgresql-stack down
 ```
 
 > [!IMPORTANT]
@@ -127,6 +130,21 @@ docker compose down
 >
 > Не меняйте имена волумов без необходимости:
 > Если вы переименуете postgres_data_volume в postgres_super_data, Docker при запуске создаст абсолютно новый, пустой волум, а старый останется в системе.
+
+## ⚠️ ВАЖНО: Безопасность и использование .env
+
+В репозитории присутствует только файл `.env.example` — это шаблон для удобного запуска проекта.  
+Настоящий `.env` файл должен быть создан локально или на сервере вручную и **никогда не храниться в публичном репозитории**.
+
+Рекомендации:
+- Скопируйте `.env.example` → `.env` и заполните своими значениями.
+- Добавьте `.env` в `.gitignore`, чтобы исключить его из коммитов.
+- Никогда не публикуйте реальные пароли, токены и ключи в GitHub.
+- Доступ к Docker и серверу должен быть ограничен только администраторам.
+- Для CI/CD используйте встроенные механизмы secrets (например, GitHub Actions Secrets).
+- Помните: переменные окружения видны через `docker inspect`. Если требуется более высокий уровень защиты, используйте Docker Swarm/Kubernetes secrets или внешние менеджеры секретов.
+
+Таким образом, проект безопасен как рецепт, но ответственность за конфиденциальность данных лежит на пользователе, который запускает его.
 
 ## 📜 Disclaimer
 
