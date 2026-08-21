@@ -2,6 +2,8 @@
 > # Postgresql stack
 > ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 > ![License](https://img.shields.io/badge/license-GNU%20AGPLv3-red.svg)
+> ![CI](https://img.shields.io/badge/CI-GitHub%20Actions-green)
+> ![CI](https://github.com/my-app-s/go-generator/actions/workflows/deploy.yml/badge.svg)
 >
 > 📦 **This is a recipe** for deploy container postgresql and pgAdmin as tools.
 
